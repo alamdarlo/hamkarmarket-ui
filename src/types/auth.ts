@@ -18,14 +18,7 @@ export interface RegisterData {
   password: string;
 }
 
-export interface JwtPayload {
-  sub: string;
-  email: string;
-  name: string;
-  role: string;
-  iat: number;
-  exp: number;
-}
+
 
 export interface AuthContextType {
   user: User | null;
