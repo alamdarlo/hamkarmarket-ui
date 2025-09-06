@@ -1,3 +1,4 @@
+// src/types/auth.ts
 export interface User {
   id: string;
   email: string;
@@ -18,21 +19,15 @@ export interface RegisterData {
   password: string;
 }
 
-
-
-export interface AuthContextType {
-  user: User | null;
-  token: string | null;
-  login: (credentials: LoginCredentials) => Promise<{ success: boolean; message?: string }>;
-  register: (userData: RegisterData) => Promise<{ success: boolean; message?: string }>;
-  logout: () => void;
-  hasRole: (role: string) => boolean;
-  isAuthenticated: boolean;
-  loading: boolean;
+export interface AuthResponse {
+  user: User;
+  token: string;
 }
 
 export interface ApiResponse<T = any> {
   data?: T;
   message?: string;
+  success: boolean;
+  status: number;
   errors?: Record<string, string[]>;
 }

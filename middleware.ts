@@ -1,52 +1,90 @@
+// src/middleware.ts
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { verifyToken } from '@/lib/auth';
 
-export function middleware(request: NextRequest) {
-  const token = request.cookies.get('token');
-  const userCookie = request.cookies.get('user');
-  
-  // Define public routes that don't require authentication
-  const publicRoutes = ['/login', '/register', '/'];
-  const isPublicRoute = publicRoutes.some(route => 
-    request.nextUrl.pathname === route
-  );
-  
-  // If trying to access a protected route without a token
-  if (!isPublicRoute && !token) {
-    return NextResponse.redirect(new URL('/login', request.url));
-  }
-  
-  // If trying to access auth routes while already authenticated
-  if (isPublicRoute && token) {
+export async function middleware(request: NextRequest) {
+  const token = request.cookies.get('auth-token')?.value;
+  const { pathname } = request.nextUrl;
+
+  // Public routes
+  const publicRoutes = ['/login', '/register'];
+  const isPublicRoute = publicRoutes.includes(pathname);
+
+  // API routes
+  const isApiRoute = pathname.startsWith('/api');
+
+  // Auth routes
+  const isAuthRoute = pathname.startsWith('/(auth)');
+
+  // Dashboard routes
+  const isDashboardRoute = pathname.startsWith('/(dashboard)');
+
+  // Redirect to dashboard if trying to access root
+  if (pathname === '/') {
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
-  // Check for admin routes
-  if (request.nextUrl.pathname.startsWith('/admin')) {
-    if (!userCookie) {
-      return NextResponse.redirect(new URL('/unauthorized', request.url));
+
+  // Handle API routes
+  if (isApiRoute) {
+    // Allow API auth routes without token
+    if (pathname.startsWith('/api/auth')) {
+      return NextResponse.next();
     }
-    
+
+    // Check token for other API routes
+    if (!token) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const isValid = await verifyToken(token);
+    if (!isValid) {
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+    }
+
+    return NextResponse.next();
+  }
+
+  // Handle auth routes
+  if (isAuthRoute && token) {
     try {
-      const user = JSON.parse(userCookie.value);
+      await verifyToken(token);
+      // Redirect to dashboard if already authenticated
+      return NextResponse.redirect(new URL('/dashboard', request.url));
+    } catch {
+      // Token is invalid, allow access to auth pages
+    }
+  }
+
+  // Handle dashboard routes
+  if (isDashboardRoute && !token) {
+    // Redirect to login if not authenticated
+    return NextResponse.redirect(new URL('/login', request.url));
+  }
+
+  // Check admin routes
+  if (pathname.startsWith('/(dashboard)/admin')) {
+    if (!token) {
+      return NextResponse.redirect(new URL('/login', request.url));
+    }
+
+    try {
+      const payload = await verifyToken(token);
+      const user = payload as any;
+
       if (!user.roles || !user.roles.includes('Admin')) {
         return NextResponse.redirect(new URL('/unauthorized', request.url));
       }
     } catch {
-      return NextResponse.redirect(new URL('/unauthorized', request.url));
+      return NextResponse.redirect(new URL('/login', request.url));
     }
   }
+
   return NextResponse.next();
 }
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
-     */
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };

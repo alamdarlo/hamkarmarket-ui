@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  /* رنگ پس‌زمینه نوار اسکرول */
+  border-radius: 10px;
+  /* شعاع گوشه‌ها */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  /* رنگ نوار اسکرول */
+  border-radius: 10px;
+  /* شعاع گوشه‌ها */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+  /* رنگ نوار اسکرول در حالت هاور */
+}
+
+
+.MuiFormHelperText-root {
+  direction: rtl !important;
+  text-align: right !important;
+  margin-top: 0 !important;
+  margin-right: 5px;
+}
+
+fieldset {
+  border-color: lightgray;
+  border-radius: 2px;
+  font-size: small;
+}
+
+legend {
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #4040cd;
+  font-size: small;
+}
+
+.error {
+  font-size: 10px !important;
+  color: #d32f2f !important;
+}
+
+
+.title {
+  font-size: 'x-small';
+  font-weight: 'bold !important'
+}
+
+.MuiDataGrid-row:nth-of-type(odd) {
+  background-color: #f3f3f3
+}
+
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif, vazir;
+}

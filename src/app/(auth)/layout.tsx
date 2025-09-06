@@ -1,12 +1,16 @@
-export default function Layout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return (
-    <main>
-      {children}
+// src/app/(auth)/layout.tsx
+import { ReactNode } from 'react';
 
-    </main>
-  )
+export default function AuthLayout({ children }: { children: ReactNode }) {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">My App</h1>
+          <p className="mt-2 text-gray-600">Sign in to your account</p>
+        </div>
+        {children}
+      </div>
+    </div>
+  );
 }
