@@ -14,3 +14,4 @@ export default function theme() {
     "& .detaile": "position: absolute;height: 200px;width: 100%;margin-top: 52px;padding: 10px"
   })
 };
+

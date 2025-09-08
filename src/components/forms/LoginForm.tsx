@@ -4,11 +4,12 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
-import {Button} from '@/components/ui/Button';
+import { Button } from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
+import CaptchaImg from '../ui/CaptchaImg';
 
 export default function LoginForm() {
-  const [credentials, setCredentials] = useState({ email: '', password: '' });
+  const [credentials, setCredentials] = useState({ phoneNumber: '', captchaText: '', password: '' });
   const [error, setError] = useState('');
   const { login, isLoading } = useAuth();
   const router = useRouter();
@@ -36,18 +37,18 @@ export default function LoginForm() {
           {error}
         </div>
       )}
-      
+
       <div>
         <Input
-          type="email"
-          name="email"
-          placeholder="Email address"
-          value={credentials.email}
+          type="tel"
+          name="phoneNumber"
+          placeholder="Phone Number"
+          value={credentials.phoneNumber}
           onChange={handleChange}
           required
         />
-      </div>
-      
+      </div>    
+
       <div>
         <Input
           type="password"
@@ -57,6 +58,10 @@ export default function LoginForm() {
           onChange={handleChange}
           required
         />
+      </div>
+
+      <div>
+        <CaptchaImg />
       </div>
       
       <Button

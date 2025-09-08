@@ -53,18 +53,20 @@ export const AuthProvider = ({ children, initialUser }: AuthProviderProps) => {
   const login = async (credentials: LoginCredentials) => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/account/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(credentials),
-      });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Login failed');
+      const response = await api.post('/account/loginWithPassword',credentials,'b97427a8-46ae-4ff1-a080-87ccc8f9165d');
+      // const response = await fetch('/account/login', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify(credentials),
+      // });
+
+      if (!response.success) {
+        const error = await response.errors;
+        throw new Error('Login failed');
       }
 
-      const { user: userData } = await response.json();
+      const { user: userData } = await response.data as any;
       setUser(userData);
     } catch (error) {
       throw error;
@@ -76,15 +78,16 @@ export const AuthProvider = ({ children, initialUser }: AuthProviderProps) => {
   const register = async (data: RegisterData) => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/account/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
+     const response = await api.post('/account/register',data);
+      // const response = await fetch('/api/account/register', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify(data),
+      // });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Registration failed');
+      if (!response.success) {
+        const error = await response.errors;
+        //throw new Error(error.message || 'Registration failed');
       }
     } catch (error) {
       throw error;

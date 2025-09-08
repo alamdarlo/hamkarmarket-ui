@@ -8,7 +8,8 @@ export interface User {
 }
 
 export interface LoginCredentials {
-  email: string;
+  phoneNumber: string;
+  captchaText: string;
   password: string;
 }
 

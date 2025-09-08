@@ -115,26 +115,9 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         {/* Header */}
-        <div className="text-center">
-          <Link
-            href="/"
-            className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-4"
-          >
-            <ArrowLeft className="w-4 h-4 mr-1" />
-            Back to home
-          </Link>
-          <h1 className="text-3xl font-bold text-gray-900">Create Account</h1>
-          <p className="mt-2 text-gray-600">
-            Join us today and start your journey
-          </p>
-        </div>
-
         <Card>
           <CardHeader>
-            <CardTitle>Sign Up</CardTitle>
-            <CardDescription>
-              Enter your details to create your account
-            </CardDescription>
+            <CardTitle className='text-center'>Sign Up</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -284,18 +267,7 @@ export default function RegisterPage() {
               >
                 {isSubmitting ? 'Creating Account...' : 'Create Account'}
               </Button>
-
-              {/* Terms Agreement */}
-              <p className="text-xs text-gray-600 text-center">
-                By creating an account, you agree to our{' '}
-                <Link href={'/terms'} key='jjk' className="text-indigo-600 hover:text-indigo-500">
-                  Terms of Service
-                </Link>{' '}
-                and{' '}
-                <Link href="/privacy" className="text-indigo-600 hover:text-indigo-500">
-                  Privacy Policy
-                </Link>
-              </p>
+             
             </form>
 
             {/* Login Link */}
@@ -309,6 +281,13 @@ export default function RegisterPage() {
             </div>
           </CardContent>
         </Card>
+                  <Link
+            href="/"
+            className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-4"
+          >
+            <ArrowLeft className="w-4 h-4 mr-1" />
+            Back to home
+          </Link>
       </div>
     </div>
   );

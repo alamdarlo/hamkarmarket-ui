@@ -22,11 +22,11 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={inter.className} dir='rtl'>
         <ToastProvider />
-        <AuthProvider initialUser={user}>
-          {children}
-        </AuthProvider>
+          <AuthProvider initialUser={user}>
+            {children}
+          </AuthProvider>
       </body>
     </html>
   );

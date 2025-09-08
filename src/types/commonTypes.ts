@@ -35,7 +35,14 @@ export class KeyValue {
     }
 }
 
-
+export class Captcha {
+    captchaCode: string;
+    captchaImage: string;
+    constructor(captchaCode: string,captchaImage: string) {
+        this.captchaCode = captchaCode;
+        this.captchaImage = captchaImage;
+    }
+}
 export class selectedRows {
     gridId: string;
     Ids: string[];
