@@ -30,5 +30,5 @@ export interface ApiResponse<T = any> {
   message?: string;
   success: boolean;
   status: number;
-  errors?: Record<string, string[]>;
+  errors?: string[];
 }

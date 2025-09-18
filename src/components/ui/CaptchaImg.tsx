@@ -24,16 +24,16 @@ const CaptchaImg = forwardRef<HTMLInputElement, InputProps>(
     }
 
     return (
-      <div className='w-full rounded-md border border-gray-300 flex justify-between'>
-        <div className='flex w-1' ></div>
+      <div className='w-full rounded-md   flex justify-center text-center'>
+        <div className=' w-1' ></div>
         <Image src={'data:image/jpeg;base64,' + captcha?.captchaImage} alt={'captcha image'} width={200} height={42} />
         <button
           type="button"
-          className=" flex  items-center"
+          className="text-center  p-3.5 bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-black"
           onClick={() => refreshCaptcha()}
         >
 
-          <RotateCcw className="h-6 w-7 text-green-500 mr-2" />
+          <RotateCcw className="h-6 " />
         </button>
       </div>
     );

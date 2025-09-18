@@ -2,7 +2,8 @@ import { createTheme } from '@mui/material/styles';
 import { arSD } from "@mui/x-data-grid/locales";
 export default function theme() {
   return createTheme({}, arSD, {
-    direction: 'rtl', palette: {
+    direction: 'rtl',
+    palette: {
       primary: { main: "#1976d2" },
     },
     typography: {

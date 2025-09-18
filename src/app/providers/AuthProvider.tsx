@@ -29,7 +29,7 @@ interface AuthProviderProps {
   initialUser: User | null;
 }
 
-export const AuthProvider = ({ children, initialUser }: AuthProviderProps) => {
+const AuthProvider = ({ children, initialUser }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(initialUser);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -37,11 +37,11 @@ export const AuthProvider = ({ children, initialUser }: AuthProviderProps) => {
     // Check for existing session on mount
     const checkSession = async () => {
       try {
-        const response = await fetch('/api/account');
-        if (response.ok) {
-          const { user: sessionUser } = await response.json();
-          setUser(sessionUser);
-        }
+        // const response = await fetch('/api/account');
+        // if (response.ok) {
+        //   const { user: sessionUser } = await response.json();
+        //   setUser(sessionUser);
+        // }
       } catch (error) {
         console.error('Session check failed:', error);
       }
@@ -120,3 +120,4 @@ export const AuthProvider = ({ children, initialUser }: AuthProviderProps) => {
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
+export default AuthProvider

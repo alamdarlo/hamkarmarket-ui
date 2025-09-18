@@ -8,13 +8,14 @@ const nextConfig: NextConfig = {
   compiler: {
     styledComponents: true,
     reactRemoveProperties: { properties: ['^data-custom$'] },
-    //removeConsole: {exclude: ['error'],},
+    removeConsole:true// {exclude: ['error'],},
   },
   typescript: {
     ignoreBuildErrors: true,
   },
   experimental:{
-    typedRoutes:true,
+    swcTraceProfiling: true,
+    //typedRoutes:true,
   },
   env: {
     NEXT_PUBLIC_API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL,
@@ -22,7 +23,6 @@ const nextConfig: NextConfig = {
     JWT_SECRET:process.env.JWT_SECRET,
   },
   reactStrictMode: true,
-  swcMinify: true,
    async redirects() {
     return [
       {

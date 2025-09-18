@@ -23,18 +23,18 @@ class ApiClient {
       ...options,
     };
 
-    try {
+    // try {
       const response = await fetch(url, config);
       const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.message || 'Request failed');
-      }
+    //   if (!response.ok) {
+    //     throw new Error(data.message || 'Request failed');
+    //   }
 
-      return data;
-    } catch (error) {
-      throw error;
-    }
+       return data;
+    // } catch (error) {
+    //   throw error;
+    // }
   }
 
   async get<T>(endpoint: string,captchaKey?:string): Promise<ApiResponse<T>> {

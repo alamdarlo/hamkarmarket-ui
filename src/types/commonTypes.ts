@@ -34,6 +34,9 @@ export class KeyValue {
         this.key = key;
     }
 }
+type keyval = Record<string, number | string>;
+type hhh=Map<string, number>
+type hhdh= Set<number>
 
 export class Captcha {
     captchaCode: string;
