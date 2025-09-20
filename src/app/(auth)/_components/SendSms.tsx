@@ -1,14 +1,11 @@
 // src/components/forms/LoginForm.tsx
 'use client';
-import { Controller, ErrorOption, useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import CaptchaImg from '../../../components/ui/CaptchaImg';
-import { defaultLoginForm } from '@/consts/defaultFormData';
+import { defaultLoginForm, defaultSendSmsForm } from '@/consts/defaultFormData';
 import { LucideUserCircle2 } from 'lucide-react';
 import Phone from '@mui/icons-material/Phone';
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { LucideCaptions } from 'lucide-react';
-import { CaptchaHandle } from '@/types/commonTypes';
 import {
   Box,
   Button,
@@ -17,70 +14,63 @@ import {
   TextField,
 } from "@mui/material";
 import { useRef, useState } from 'react';
-import { ILoginForm } from '../types';
+import { ISendSmsForm } from '../types';
 import { authService } from '../services/AuthService';
-import { toast } from 'react-toastify';
+import { CaptchaHandle } from '@/types/commonTypes';
+import { useCountdown } from '@/hooks/useCountdown';
 
-
-export default function LoginForm() {
+export default function SendSms() {
   const captchaRef = useRef<CaptchaHandle>(null);
-  const [showPassword, setShowPassword] = useState(false);
+  const { timeLeft, isCounting, start,stclearTimer } = useCountdown();
+
   const [loading, setLoading] = useState(false);
-  const handleClickShowPassword = () => setShowPassword((show) => !show);
   const [generalError, setGeneralError] = useState<string[]>([]);
   const {
     control,
     handleSubmit,
     reset,
-    watch,
-    getFieldState,
-    setError,
     formState: { errors, isValid },
-  } = useForm<ILoginForm>({ defaultValues: defaultLoginForm, mode: 'all', reValidateMode: 'onBlur' });
+  } = useForm<ISendSmsForm>({ defaultValues: defaultSendSmsForm, mode: 'all', reValidateMode: 'onBlur' });
 
 
-  const onSubmit = async (data: ILoginForm) => {
+  const onSubmit = async (data: ISendSmsForm) => {
     setGeneralError([]);
     setLoading(true);
     console.log(data)
     if (captchaRef.current) {
       const captchaKey = captchaRef.current.getCaptchaKey();
-      authService.loginWithPassword(data, captchaKey).then(function (result) {
-        if (!result.isSuccess)
-          setGeneralError(result.errors! || ['خطايي رخ داده است لطفا بعدا تلاش نماييد']);
-        else
-          alert('login success')
+      authService.sendSmsCode(data, captchaKey).then(function (result) {
+        debugger
+        if (!result.isSuccess){
+          debugger
+          stclearTimer();
+          
+          setGeneralError(result?.errors! || ['خطايي رخ داده است لطفا بعدا تلاش نماييد']);}
+        else {
+          debugger
+          start(120); // Start 2-minute countdown
+
+        }
       })
         .catch(function (error: any) {
-          if (error.code == "ERR_NETWORK")
+          if (error.code == "ERR_NETWORK") {
             console.log(error)
+          }
         }).finally(function () {
           setLoading(false);
         })
-    } else
-      toast.error("خطا در گرفتن اطلاعات كپچاي تصويري")
+    }
   }
+ const formatTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
 
   const resetForm = async () => {
     setGeneralError([]);
     setLoading(false);
     reset(defaultLoginForm);
-  }
-
-  const sendSms = async () => {
-    const phoneNumber = watch("phoneNumber")
-    const errr = errors["phoneNumber"]
-    const { isDirty, invalid } = getFieldState("phoneNumber")
-    resetForm()
-    reset({ ...defaultLoginForm, phoneNumber: phoneNumber });
-
-    if (!isDirty || invalid) {
-      setError("phoneNumber", errr as ErrorOption)
-      console.log(phoneNumber)
-    }
-    else {
-      console.log(phoneNumber)
-    }
   }
 
   return (
@@ -89,7 +79,6 @@ export default function LoginForm() {
         <div>
           <div className="text-center flex justify-center mt-3">
             <LucideUserCircle2 className="size-20 mr-2 flex" fontSize={10} fontWeight={10} />
-            {/* <AccountCircleRoundedIcon fontSize='large' sx={{ fontSize: 80 }} /> */}
           </div><strong className='flex justify-center text-2xl pr-5'>ورود كاربر</strong>
           <h1>
             <p className="text-center   text-xl">
@@ -97,7 +86,7 @@ export default function LoginForm() {
             </p>
           </h1>
 
-          <Box component="form" onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-12 grid-rows-5 mt-5 bg-white" >
+          <Box component="form" onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-12 grid-rows-4 mt-5 bg-white" >
             <div className="grid col-span-10 col-start-2 h-[72px]" >
               <Controller
                 name="phoneNumber"
@@ -142,56 +131,6 @@ export default function LoginForm() {
                 )}
               />
             </div>
-            <div className="grid col-span-10 col-start-2 h-[72px]">
-              <Controller
-                name="password"
-                control={control}
-                defaultValue=""
-                rules={{
-                  required: ' رمز عبور اجباريست',
-                  min: { value: 4, message: '2' },
-                }}
-                render={({ field: { ref, ...field } }) => (
-                  <TextField
-                    {...field}
-                    inputRef={ref}
-                    error={!!errors.password}
-                    helperText={errors.password?.message as string}
-                    id="password"
-                    type={showPassword ? 'text' : 'password'}
-                    label="رمز عبور"
-                    size="small"
-                    slotProps={{
-                      input: {
-                        sx: { borderRadius: 100, padding: '1px 0px' },
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <IconButton
-                              aria-label={
-                                showPassword ? 'hide the password' : 'display the password'
-                              }
-                              onClick={handleClickShowPassword}
-                            >
-                              {showPassword ? <VisibilityOff /> : <Visibility />}
-                            </IconButton>
-                            {/* <LucideLock /> */}
-                          </InputAdornment>
-                        ),
-                      },
-
-                      inputLabel: {
-                        shrink: true,
-                        sx: { fontSize: '20px' }
-                      },
-                    }}
-                    variant="outlined"
-                    sx={{}}
-                  />
-                )}
-              />
-            </div>
-
-
 
             <div className="grid col-span-10 col-start-2 h-[72px]">
               <Controller
@@ -240,14 +179,15 @@ export default function LoginForm() {
                 type="submit"
                 size='large'
                 loading={loading}
+                disabled={isCounting}
                 loadingPosition="center"
+                loadingIndicator={`ارسال مجدد بعد از:  ${formatTime(timeLeft)}` }
                 variant="outlined"
-                //loadingIndicator="ورود..."
                 sx={{ borderRadius: 100 }}
                 className="border border-gray-300 rounded-full"
               >
-                <span className="text-3xl">ورود</span>
-                {/* {isLoading ? 'Signing in...' : 'Sign in'} */}
+                {!isCounting? <span className="text-3xl">ارسال رمز</span> :<span className="text-2xl">{`ارسال مجدد بعد از:  ${formatTime(timeLeft)}` }</span>}
+                
               </Button>
             </div>
             <div className='grid col-span-12 '>
@@ -260,15 +200,6 @@ export default function LoginForm() {
               </ul>
             </div>
           </Box>
-          {/* <div className="mt-6 text-center mb-3">
-            <Link
-              component="button"
-              variant="body2"
-              onClick={sendSms}
-            >
-              ارسال رمز به شماره موبايل
-            </Link>
-          </div> */}
         </div >
 
       </div >

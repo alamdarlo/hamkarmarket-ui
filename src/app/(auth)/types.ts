@@ -4,6 +4,11 @@ export interface ILoginForm {
     captchaText?: string,
 }
 
+export interface ISendSmsForm {
+    phoneNumber: string,
+    captchaText?: string,
+}
+
 
 import { z } from 'zod';
 

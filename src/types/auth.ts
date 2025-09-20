@@ -28,7 +28,22 @@ export interface AuthResponse {
 export interface ApiResponse<T = any> {
   data?: T;
   message?: string;
-  success: boolean;
+  isSuccess: boolean;
   status: number;
   errors?: string[];
+  error?: string;
+}
+export class Result<T = any> implements ApiResponse<T> {
+  data?: T;
+  message?: string;
+  isSuccess: boolean;
+  status: number;
+  errors?: string[];
+  error?: string;
+    constructor(data: any | null, status: number, isSuccess: boolean, message?: string) {
+        this.data = data;
+        this.status = status;
+        this.isSuccess = isSuccess;
+        this.message = message;
+    }
 }

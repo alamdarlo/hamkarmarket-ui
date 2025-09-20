@@ -1,5 +1,7 @@
 // src/lib/api.ts
 import { ApiResponse } from '@/types/auth';
+import { error } from 'console';
+import { toast } from 'react-toastify';
 
 class ApiClient {
   private baseURL: string;
@@ -11,56 +13,71 @@ class ApiClient {
   private async request<T>(
     endpoint: string,
     options: RequestInit = {},
-    captchaKey?:string
+    captchaKey?: string
   ): Promise<ApiResponse<T>> {
     const url = `${this.baseURL}${endpoint}`;
     const config: RequestInit = {
       headers: {
         'Content-Type': 'application/json',
-        'X-Captcha-Token':captchaKey??'',
+        'X-Captcha-Token': captchaKey ?? '',
         ...options.headers,
       },
       ...options,
     };
 
+    let res: ApiResponse<T> = {} as ApiResponse<T>;
     // try {
-      const response = await fetch(url, config);
+      const response=  await fetch(url, config);
+     
+      debugger
       const data = await response.json();
 
-    //   if (!response.ok) {
-    //     throw new Error(data.message || 'Request failed');
-    //   }
+      debugger
+      if (!response.ok) {
+        debugger
+        toast.error("error")
+        console.log(data)
+        res
+      } else {
+        debugger
+        console.log(data)
 
+      }
+      debugger
        return data;
-    // } catch (error) {
-    //   throw error;
+    // } catch (error: any) {
+
+    //   console.log(error)
+
+    //   debugger
+    //   return { ...res, isSuccess: false, data: {} as T, errors: ['خطايي رخ داده است لطفا بعدا تلاش نماييد'] };
     // }
   }
 
-  async get<T>(endpoint: string,captchaKey?:string): Promise<ApiResponse<T>> {
-    return this.request<T>(endpoint, { method: 'GET' },captchaKey);
+  async get<T>(endpoint: string, captchaKey?: string): Promise<ApiResponse<T>> {
+    return this.request<T>(endpoint, { method: 'GET' }, captchaKey);
   }
 
-  async post<T>(endpoint: string, data?: any,captchaKey?:string): Promise<ApiResponse<T>> {
+  async post<T>(endpoint: string, data?: any, captchaKey?: string): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
       method: 'POST',
       body: JSON.stringify(data),
     },
-    captchaKey
-  );
+      captchaKey
+    );
   }
 
-  async put<T>(endpoint: string, data?: any,captchaKey?:string): Promise<ApiResponse<T>> {
+  async put<T>(endpoint: string, data?: any, captchaKey?: string): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
       method: 'PUT',
       body: JSON.stringify(data),
     },
-    captchaKey
-  );
+      captchaKey
+    );
   }
 
-  async delete<T>(endpoint: string,captchaKey?:string): Promise<ApiResponse<T>> {
-    return this.request<T>(endpoint, { method: 'DELETE' },captchaKey);
+  async delete<T>(endpoint: string, captchaKey?: string): Promise<ApiResponse<T>> {
+    return this.request<T>(endpoint, { method: 'DELETE' }, captchaKey);
   }
 }
 

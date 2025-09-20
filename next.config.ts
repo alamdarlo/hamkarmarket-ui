@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
   compiler: {
     styledComponents: true,
     reactRemoveProperties: { properties: ['^data-custom$'] },
-    removeConsole:true// {exclude: ['error'],},
+    removeConsole:false// {exclude: ['error'],},
   },
   typescript: {
     ignoreBuildErrors: true,
