@@ -1,57 +1,91 @@
 // src/lib/api.ts
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { ApiResponse } from '@/types/auth';
-import { error } from 'console';
-import { toast } from 'react-toastify';
 
 class ApiClient {
   private baseURL: string;
 
   constructor() {
     this.baseURL = process.env.NEXT_PUBLIC_API_URL || 'https://localhost:44340';
+
+    // Create axios instance with default config
+    this.axiosInstance = axios.create({
+      baseURL: this.baseURL,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
   }
+
+  private axiosInstance;
 
   private async request<T>(
     endpoint: string,
-    options: RequestInit = {},
+    options: AxiosRequestConfig = {},
     captchaKey?: string
   ): Promise<ApiResponse<T>> {
-    const url = `${this.baseURL}${endpoint}`;
-    const config: RequestInit = {
+    const config: AxiosRequestConfig = {
+      url: endpoint,
       headers: {
-        'Content-Type': 'application/json',
         'X-Captcha-Token': captchaKey ?? '',
         ...options.headers,
       },
       ...options,
     };
 
-    let res: ApiResponse<T> = {} as ApiResponse<T>;
-    // try {
-      const response=  await fetch(url, config);
-     
-      debugger
-      const data = await response.json();
+    try {
+      const response: AxiosResponse<ApiResponse<T>> = await this.axiosInstance.request(config);
 
-      debugger
-      if (!response.ok) {
-        debugger
-        toast.error("error")
-        console.log(data)
-        res
+      if (response.status >= 200 && response.status < 300) {
+        return response.data;
       } else {
-        debugger
-        console.log(data)
-
+        console.log(response.data);
+        return {
+          isSuccess: false,
+          data: {} as T,
+          errors: ['خطايي رخ داده است']
+        } as ApiResponse<T>;
       }
-      debugger
-       return data;
-    // } catch (error: any) {
+    } catch (error: any) {
+      console.log(error);
 
-    //   console.log(error)
+      // Check if it's a CORS error
+      const isCorsError = this.isCorsError(error);
 
-    //   debugger
-    //   return { ...res, isSuccess: false, data: {} as T, errors: ['خطايي رخ داده است لطفا بعدا تلاش نماييد'] };
-    // }
+      if (isCorsError) {
+        return {
+          isSuccess: false,
+          data: {} as T,
+          errors: ['لطفا بعدا تلاش نماييد']
+        } as ApiResponse<T>;
+      }
+
+      if (error.response) {
+        return {
+          isSuccess: false,
+          data: {} as T,
+          errors: error.response.data?.errors || ['خطايي رخ داده است']
+        } as ApiResponse<T>;
+
+      } else if (error.request) {
+        // Request was made but no response received
+        return {
+          isSuccess: false,
+          data: {} as T,
+          errors: ['خطايي در ارتباط با سرور رخ داده است']
+        } as ApiResponse<T>;
+
+      } else {
+        const isCorsError = this.isCorsError(error);
+        console.log(isCorsError);
+        // Other errors
+        return {
+          isSuccess: false,
+          data: {} as T,
+          errors: ['خطايي رخ داده است لطفا بعدا تلاش نماييد']
+        } as ApiResponse<T>;
+      }
+    }
   }
 
   async get<T>(endpoint: string, captchaKey?: string): Promise<ApiResponse<T>> {
@@ -61,24 +95,47 @@ class ApiClient {
   async post<T>(endpoint: string, data?: any, captchaKey?: string): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
       method: 'POST',
-      body: JSON.stringify(data),
-    },
-      captchaKey
-    );
+      data: data,
+    }, captchaKey);
   }
 
   async put<T>(endpoint: string, data?: any, captchaKey?: string): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
       method: 'PUT',
-      body: JSON.stringify(data),
-    },
-      captchaKey
-    );
+      data: data,
+    }, captchaKey);
   }
 
   async delete<T>(endpoint: string, captchaKey?: string): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, { method: 'DELETE' }, captchaKey);
   }
+
+  // Method to detect CORS errors
+  private isCorsError(error: AxiosError): boolean {
+    // CORS errors typically have no response and specific error messages
+    if (!error.response) {
+      const errorMessage = error.message || '';
+
+      // Common CORS error indicators
+      const corsIndicators = [
+        'network error',
+        'cross-origin',
+        'cors',
+        'failed to fetch',
+        'access-control',
+        'origin not allowed'
+      ];
+
+      return corsIndicators.some(indicator =>
+        errorMessage.toLowerCase().includes(indicator)
+      );
+    }
+
+    return false;
+  }
+
 }
 
 export const api = new ApiClient();
+
+

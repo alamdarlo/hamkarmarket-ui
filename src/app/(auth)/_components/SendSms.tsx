@@ -13,15 +13,28 @@ import {
   InputAdornment,
   TextField,
 } from "@mui/material";
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ISendSmsForm } from '../types';
 import { authService } from '../services/AuthService';
 import { CaptchaHandle } from '@/types/commonTypes';
-import { useCountdown } from '@/hooks/useCountdown';
 
-export default function SendSms() {
+type props = {
+  timeLeft: number,
+  isCounting: boolean
+  startCount: (duration: number) => void
+  setSmsKey: (key: string) => void
+}
+
+export default function SendSms(prop: props) {
   const captchaRef = useRef<CaptchaHandle>(null);
-  const { timeLeft, isCounting, start,stclearTimer } = useCountdown();
+
+  useEffect(() => {
+    prop.setSmsKey('')
+  
+    return () => {
+    }
+  }, [])
+  
 
   const [loading, setLoading] = useState(false);
   const [generalError, setGeneralError] = useState<string[]>([]);
@@ -36,20 +49,19 @@ export default function SendSms() {
   const onSubmit = async (data: ISendSmsForm) => {
     setGeneralError([]);
     setLoading(true);
-    console.log(data)
     if (captchaRef.current) {
+
       const captchaKey = captchaRef.current.getCaptchaKey();
       authService.sendSmsCode(data, captchaKey).then(function (result) {
-        debugger
-        if (!result.isSuccess){
-          debugger
-          stclearTimer();
-          
-          setGeneralError(result?.errors! || ['خطايي رخ داده است لطفا بعدا تلاش نماييد']);}
-        else {
-          debugger
-          start(120); // Start 2-minute countdown
+        prop.startCount(120);
 
+        if (!result.isSuccess) {
+          setGeneralError(result?.errors! || ['خطايي رخ داده است لطفا بعدا تلاش نماييد']);
+        }
+        else {
+          console.log(result)
+          const key = result.data?.key
+          prop.setSmsKey(key)
         }
       })
         .catch(function (error: any) {
@@ -61,7 +73,7 @@ export default function SendSms() {
         })
     }
   }
- const formatTime = (seconds: number): string => {
+  const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
@@ -179,15 +191,15 @@ export default function SendSms() {
                 type="submit"
                 size='large'
                 loading={loading}
-                disabled={isCounting}
+                disabled={prop.isCounting}
                 loadingPosition="center"
-                loadingIndicator={`ارسال مجدد بعد از:  ${formatTime(timeLeft)}` }
+                loadingIndicator={`ارسال مجدد بعد از:  ${formatTime(prop.timeLeft)}`}
                 variant="outlined"
                 sx={{ borderRadius: 100 }}
                 className="border border-gray-300 rounded-full"
               >
-                {!isCounting? <span className="text-3xl">ارسال رمز</span> :<span className="text-2xl">{`ارسال مجدد بعد از:  ${formatTime(timeLeft)}` }</span>}
-                
+                {!prop.isCounting ? <span className="text-3xl">ارسال رمز</span> : <span className="text-2xl">{`ارسال مجدد بعد از:  ${formatTime(prop.timeLeft)}`}</span>}
+
               </Button>
             </div>
             <div className='grid col-span-12 '>

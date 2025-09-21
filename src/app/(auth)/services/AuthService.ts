@@ -5,9 +5,9 @@ import { ILoginForm, ISendSmsForm } from '../types';
 
 class AuthService {
 
-     loginWithPassword =async (model:ILoginForm,captchaCode: string):Promise<ApiResponse>=> {
+     loginWithPassword =async (model:ILoginForm,smsKey: string,captchaCode: string):Promise<ApiResponse>=> {
         debugger
-      return await api.post('/api/account/loginWithPassword',{password:'1245',phoneNumber:'125454'},captchaCode)
+      return await api.post('/api/account/loginWithPassword',{...model,smsKey},captchaCode)
     }
      sendSmsCode =async (model:ISendSmsForm,captchaCode: string):Promise<ApiResponse>=> {
         debugger

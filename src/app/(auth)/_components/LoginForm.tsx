@@ -21,8 +21,10 @@ import { ILoginForm } from '../types';
 import { authService } from '../services/AuthService';
 import { toast } from 'react-toastify';
 
-
-export default function LoginForm() {
+type props = {
+  smsKey: string,
+}
+export default function LoginForm(prop:props) {
   const captchaRef = useRef<CaptchaHandle>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -42,10 +44,13 @@ export default function LoginForm() {
   const onSubmit = async (data: ILoginForm) => {
     setGeneralError([]);
     setLoading(true);
-    console.log(data)
+
     if (captchaRef.current) {
+
       const captchaKey = captchaRef.current.getCaptchaKey();
-      authService.loginWithPassword(data, captchaKey).then(function (result) {
+
+      authService.loginWithPassword(data,prop.smsKey, captchaKey).then(function (result) {
+
         if (!result.isSuccess)
           setGeneralError(result.errors! || ['خطايي رخ داده است لطفا بعدا تلاش نماييد']);
         else
