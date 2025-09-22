@@ -4,6 +4,13 @@ export interface ILoginForm {
     captchaText?: string,
 }
 
+export interface IChangePasswordForm {
+    phoneNumber: string,
+    password: string,
+    confirmPassword: string,
+    captchaText: string,
+}
+
 export interface ISendSmsForm {
     phoneNumber: string,
     captchaText?: string,

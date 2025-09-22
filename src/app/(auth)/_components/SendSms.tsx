@@ -2,7 +2,6 @@
 'use client';
 import { Controller, useForm } from 'react-hook-form';
 import CaptchaImg from '../../../components/ui/CaptchaImg';
-import { defaultLoginForm, defaultSendSmsForm } from '@/consts/defaultFormData';
 import { LucideUserCircle2 } from 'lucide-react';
 import Phone from '@mui/icons-material/Phone';
 import { LucideCaptions } from 'lucide-react';
@@ -17,6 +16,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ISendSmsForm } from '../types';
 import { authService } from '../services/AuthService';
 import { CaptchaHandle } from '@/types/commonTypes';
+import { defaultSendSmsForm } from '../consts/defaultForms';
 
 type props = {
   timeLeft: number,
@@ -82,7 +82,7 @@ export default function SendSms(prop: props) {
   const resetForm = async () => {
     setGeneralError([]);
     setLoading(false);
-    reset(defaultLoginForm);
+    reset(defaultSendSmsForm);
   }
 
   return (

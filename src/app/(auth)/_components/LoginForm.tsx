@@ -2,7 +2,6 @@
 'use client';
 import { Controller, ErrorOption, useForm } from 'react-hook-form';
 import CaptchaImg from '../../../components/ui/CaptchaImg';
-import { defaultLoginForm } from '@/consts/defaultFormData';
 import { LucideUserCircle2 } from 'lucide-react';
 import Phone from '@mui/icons-material/Phone';
 import Visibility from '@mui/icons-material/Visibility';
@@ -20,6 +19,7 @@ import { useRef, useState } from 'react';
 import { ILoginForm } from '../types';
 import { authService } from '../services/AuthService';
 import { toast } from 'react-toastify';
+import { defaultLoginForm } from '../consts/defaultForms';
 
 type props = {
   smsKey: string,
@@ -89,18 +89,11 @@ export default function LoginForm(prop:props) {
   }
 
   return (
-    <>
       <div className=" justify-center items-center " >
         <div>
           <div className="text-center flex justify-center mt-3">
             <LucideUserCircle2 className="size-20 mr-2 flex" fontSize={10} fontWeight={10} />
-            {/* <AccountCircleRoundedIcon fontSize='large' sx={{ fontSize: 80 }} /> */}
           </div><strong className='flex justify-center text-2xl pr-5'>ورود كاربر</strong>
-          <h1>
-            <p className="text-center   text-xl">
-
-            </p>
-          </h1>
 
           <Box component="form" onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-12 grid-rows-5 mt-5 bg-white" >
             <div className="grid col-span-10 col-start-2 h-[72px]" >
@@ -247,12 +240,10 @@ export default function LoginForm(prop:props) {
                 loading={loading}
                 loadingPosition="center"
                 variant="outlined"
-                //loadingIndicator="ورود..."
                 sx={{ borderRadius: 100 }}
                 className="border border-gray-300 rounded-full"
               >
                 <span className="text-3xl">ورود</span>
-                {/* {isLoading ? 'Signing in...' : 'Sign in'} */}
               </Button>
             </div>
             <div className='grid col-span-12 '>
@@ -265,19 +256,8 @@ export default function LoginForm(prop:props) {
               </ul>
             </div>
           </Box>
-          {/* <div className="mt-6 text-center mb-3">
-            <Link
-              component="button"
-              variant="body2"
-              onClick={sendSms}
-            >
-              ارسال رمز به شماره موبايل
-            </Link>
-          </div> */}
         </div >
 
       </div >
-
-    </>
   );
 }
