@@ -19,7 +19,7 @@ import { useRef, useState } from 'react';
 import { ILoginForm } from '../types';
 import { authService } from '../services/AuthService';
 import { toast } from 'react-toastify';
-import { defaultLoginForm } from '../consts/defaultForms';
+import { defaultLoginForm } from '../_consts/defaultForms';
 
 type props = {
   smsKey: string,

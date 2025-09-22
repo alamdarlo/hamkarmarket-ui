@@ -5,7 +5,7 @@ import LockResetIcon from '@mui/icons-material/LockReset';
 import { useRef, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form';
 import { IChangePasswordForm } from '../types';
-import { defaultChangepasswordForm } from '../consts/defaultForms';
+import { defaultChangepasswordForm } from '../_consts/defaultForms';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import Visibility from '@mui/icons-material/Visibility';
 import CaptchaImg from '@/components/ui/CaptchaImg';

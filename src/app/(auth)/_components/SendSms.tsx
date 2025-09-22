@@ -16,7 +16,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ISendSmsForm } from '../types';
 import { authService } from '../services/AuthService';
 import { CaptchaHandle } from '@/types/commonTypes';
-import { defaultSendSmsForm } from '../consts/defaultForms';
+import { defaultSendSmsForm } from '../_consts/defaultForms';
 
 type props = {
   timeLeft: number,
