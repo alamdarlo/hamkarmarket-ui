@@ -14,7 +14,7 @@ export default function IkcoDatePicker(props: IProps) {
     }
 
     return (
-        <DatePicker onChange={(e) => handleOnChange(e)} className={props.className + 'p-0'}
+        <DatePicker onChange={(e:any) => handleOnChange(e)} className={props.className + 'p-0'}
             sx={{ "& .muirtl-1dune0f-MuiInputBase-input-MuiOutlinedInput-input": { padding: "10px" } }}
             value={new Date(props.value)}
         />

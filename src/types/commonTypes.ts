@@ -4,6 +4,12 @@ import createCache from '@emotion/cache';
 import { createTheme } from '@mui/material/styles';
 import { arSD } from "@mui/x-data-grid/locales";
 
+interface CaptchaHandle {
+  getCaptchaKey: () => string;
+  refreshCaptcha: () => Promise<void>;
+}
+
+
 interface IResult {
     data: any | null | undefined;
     status: number;
@@ -34,6 +40,9 @@ export class KeyValue {
         this.key = key;
     }
 }
+type keyval = Record<string, number | string>;
+type hhh=Map<string, number>
+type hhdh= Set<number>
 
 export class Captcha {
     captchaCode: string;
@@ -66,4 +75,4 @@ export const cacheRtl = createCache({
   });
 
   type GridActions = 'Edit' | 'Delete' | 'Cancel' | 'Save';
-  export type { IResult, GridActions }
+  export type { IResult, GridActions,CaptchaHandle }
