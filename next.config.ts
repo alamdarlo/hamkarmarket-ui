@@ -1,37 +1,43 @@
 import type { NextConfig } from "next";
 
+const withPWA = require('next-pwa')({
+  dest: 'public',
+  register: true,
+  skipWaiting: true,
+  disable: process.env.NODE_ENV === 'development',
+})
+
 const nextConfig: NextConfig = {
-  productionBrowserSourceMaps:false,
+  productionBrowserSourceMaps: false,
   eslint: {
-    ignoreDuringBuilds: true, // skips all ESLint errors at build time
+    ignoreDuringBuilds: true,
   },
   compiler: {
     styledComponents: true,
     reactRemoveProperties: { properties: ['^data-custom$'] },
-    removeConsole:false// {exclude: ['error'],},
+    removeConsole: false,
   },
   typescript: {
     ignoreBuildErrors: true,
   },
-  experimental:{
+  experimental: {
     swcTraceProfiling: true,
-    //typedRoutes:true,
   },
   env: {
     NEXT_PUBLIC_API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL,
-    SESSION_SECRET:process.env.SESSION_SECRET,
-    JWT_SECRET:process.env.JWT_SECRET,
+    SESSION_SECRET: process.env.SESSION_SECRET,
+    JWT_SECRET: process.env.JWT_SECRET,
   },
   reactStrictMode: true,
-   async redirects() {
+  async redirects() {
     return [
       {
         source: '/',
         destination: '/dashboard',
         permanent: false,
       },
-    ];
+    ]
   },
-};
+}
 
-export default nextConfig;
+export default withPWA(nextConfig)
