@@ -51,8 +51,10 @@ export default function LoginForm(prop:props) {
 
       authService.loginWithPassword(data,prop.smsKey, captchaKey).then(function (result) {
 
-        if (!result.isSuccess)
+        if (!result.isSuccess){
           setGeneralError(result.errors! || ['خطايي رخ داده است لطفا بعدا تلاش نماييد']);
+
+        }
         else
           alert('login success')
       })
