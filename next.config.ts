@@ -1,43 +1,70 @@
 import type { NextConfig } from "next";
 
-const withPWA = require('next-pwa')({
-  dest: 'public',
-  register: true,
-  skipWaiting: true,
-  disable: process.env.NODE_ENV === 'development',
-})
-
 const nextConfig: NextConfig = {
-  productionBrowserSourceMaps: false,
-  eslint: {
-    ignoreDuringBuilds: true,
+  /* config options here */
+  images: {
+    unoptimized: false, // در صورت مشکل true کنید
   },
-  compiler: {
-    styledComponents: true,
-    reactRemoveProperties: { properties: ['^data-custom$'] },
-    removeConsole: false,
+  // تنظیمات تولید
+  poweredByHeader: false,
+  experimental: {
+    globalNotFound: true,
   },
+  compress: true,
+  reactStrictMode: true,
+  turbopack: {},
   typescript: {
     ignoreBuildErrors: true,
   },
-  experimental: {
-    swcTraceProfiling: true,
-  },
-  env: {
-    NEXT_PUBLIC_API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL,
-    SESSION_SECRET: process.env.SESSION_SECRET,
-    JWT_SECRET: process.env.JWT_SECRET,
-  },
-  reactStrictMode: true,
-  async redirects() {
+  async headers() {
     return [
       {
-        source: '/',
-        destination: '/dashboard',
-        permanent: false,
+        source: "/(.*)",
+        headers: [
+          {
+            key: "X-Content-Type-Options",
+            value: "nosniff",
+          },
+          {
+            key: "X-Frame-Options",
+            value: "DENY",
+          },
+          {
+            key: "Referrer-Policy",
+            value: "strict-origin-when-cross-origin",
+          },
+          { key: "X-Forwarded-Proto", value: "https" },
+        ],
       },
-    ]
+      {
+        source: "/sw.js",
+        headers: [
+          {
+            key: "Content-Type",
+            value: "application/javascript; charset=utf-8",
+          },
+          {
+            key: "Cache-Control",
+            value: "no-cache, no-store, must-revalidate",
+          },
+          {
+            key: "Content-Security-Policy",
+            value: "default-src 'self'; script-src 'self'",
+          },
+        ],
+      },
+    ];
   },
-}
+};
 
-export default withPWA(nextConfig)
+//next dev --experimental-https
+
+const withPWA = require("next-pwa")({
+  dest: "public",
+  disable: process.env.NODE_ENV === 'development',
+  register: true,
+  skipWaiting: true,
+  sw: "sw.js",
+});
+
+export default withPWA(nextConfig);

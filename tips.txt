@@ -1,0 +1,10 @@
+
+
+refreshToken داخل HttpOnly Cookie است (سمت بک‌اند)
+Set-Cookie: access_token=...; HttpOnly; Secure; SameSite=Strict
+Set-Cookie: refresh_token=...; HttpOnly; Secure; SameSite=Strict
+
+POST /auth/login
+POST /auth/refresh
+POST /auth/logout
+
