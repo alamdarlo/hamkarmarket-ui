@@ -90,7 +90,7 @@ const ProductsPage = () => {
         type: orderType,
         quantity,
         totalPrice: orderType === 'buy' 
-          ? selectedProduct.price * quantity 
+          ? selectedProduct.price! * quantity 
           : selectedProduct.sellPrice! * quantity,
       };
 
@@ -144,6 +144,8 @@ const ProductsPage = () => {
                 <CardMedia
                   component="img"
                   height="200"
+
+                  
                   image={product.imageUrl}
                   alt={product.name}
                   className="h-48 object-cover"
@@ -245,10 +247,10 @@ const ProductsPage = () => {
                 <Box>
                   <Typography variant="h6">{selectedProduct.name}</Typography>
                   <Typography variant="body2" color="text.secondary">
-                    قیمت:{' '}
+                    قیمت:
                     {orderType === 'buy'
-                      ? selectedProduct.price.toLocaleString()
-                      : selectedProduct.sellPrice?.toLocaleString()}{' '}
+                      ? selectedProduct.price?.toLocaleString()
+                      : selectedProduct.sellPrice?.toLocaleString()}
                     تومان
                   </Typography>
                 </Box>
@@ -268,12 +270,12 @@ const ProductsPage = () => {
                   موجودی: {selectedProduct.stock} عدد
                 </Typography>
                 <Typography variant="h6" className="mt-2">
-                  مبلغ کل:{' '}
+                  مبلغ کل:
                   {(
                     (orderType === 'buy'
                       ? selectedProduct.price
                       : selectedProduct.sellPrice || 0) * quantity
-                  ).toLocaleString()}{' '}
+                  ).toLocaleString()}
                   تومان
                 </Typography>
               </Box>
