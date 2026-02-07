@@ -2,13 +2,11 @@ export interface Product {
   id: number;
   name: string;
   description: string;
-  price: number;
-  sellPrice?: number;
+  minPrice: number;
+  maxPrice: number;
   imageUrl: string;
   category: string;
-  stock: number;
-  createdAt: string;
-  updatedAt: string;
+  quantity: number;
 }
 
 export type OrderType = 'buy' | 'sell';

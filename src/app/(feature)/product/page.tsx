@@ -1,6 +1,7 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
+import { NumericFormat } from "react-number-format";
 import {
   Container,
   Grid,
@@ -21,58 +22,47 @@ import {
   Box,
   useMediaQuery,
   useTheme,
-} from '@mui/material';
-import {
-  AddShoppingCart,
-  Sell,
-} from '@mui/icons-material';
-import { OrderType, Product } from './types/product';
-import { useProducts } from './queries/useProducts';
+  CircularProgress,
+  Slider,
+} from "@mui/material";
+import { AddShoppingCart, Sell } from "@mui/icons-material";
+import { OrderType, Product } from "./types/product";
+import { useProducts } from "./queries/useProducts";
 
+//const minDistance = 5;
+function valuetext(value: number) {
+  return `${value }°C`;
+}
 
 const ProductsPage = () => {
-  const [selectedProduct, setSelectedProduct] = useState<Product | null| undefined>(null);
+  const [selectedProduct, setSelectedProduct] = useState<
+    Product | null | undefined
+  >(null);
   const [orderDialogOpen, setOrderDialogOpen] = useState(false);
-  const [orderType, setOrderType] = useState<OrderType>('buy');
+  const [orderType, setOrderType] = useState<OrderType>("buy");
   const [quantity, setQuantity] = useState(1);
+  const [value1, setValue1] = React.useState<number[]>([1400, 1800]);
+  const [minPrice, setMinPrice] = useState<string>("1");
+  const [maxPrice, setMaxPrice] = useState<string>("1");
+
   const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
-   const {
-    data: productsData,
-    isLoading,
-    error,
-    refetch,
-  } = useProducts();
+  const { data: productsData, isLoading, error, refetch } = useProducts();
 
-   const products = productsData?.data || [];
+  const products = productsData?.data || [];
 
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery(theme.breakpoints.down("md"));
 
   useEffect(() => {
     //fetchProducts();
   }, []);
+const handleChange = (event: Event, newValue: number[]) => {
+    setValue1(newValue);
+  };
 
-  // const fetchProducts = async () => {
-  //   try {
-  //     // setLoading(true);
-  //     // فراخوانی API بک‌اند
-  //     const response = await fetch('/api/products');
-      
-  //     if (!response.ok) {
-  //       throw new Error('خطا در دریافت محصولات');
-  //     }
-      
-  //     const data = await response.json();
-  //     // setProducts(data);
-  //   } catch (err) {
-  //     // setError(err instanceof Error ? err.message : 'خطای ناشناخته');
-  //   } finally {
-  //     // setLoading(false);
-  //   }
-  // };
 
   const handleOrderClick = (product: Product, type: OrderType) => {
     setSelectedProduct(product);
@@ -89,52 +79,76 @@ const ProductsPage = () => {
         productId: selectedProduct.id,
         type: orderType,
         quantity,
-        totalPrice: orderType === 'buy' 
-          ? selectedProduct.price! * quantity 
-          : selectedProduct.sellPrice! * quantity,
+        totalPrice:
+          orderType === "buy"
+            ? selectedProduct.minPrice! * quantity
+            : selectedProduct.maxPrice! * quantity,
       };
 
       // ارسال درخواست به بک‌اند
-      const response = await fetch('/api/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(orderData),
       });
 
       if (response.ok) {
         setSnackbarMessage(
-          orderType === 'buy' 
-            ? 'خرید با موفقیت ثبت شد' 
-            : 'فروش با موفقیت ثبت شد'
+          orderType === "buy"
+            ? "خرید با موفقیت ثبت شد"
+            : "فروش با موفقیت ثبت شد",
         );
         setSnackbarOpen(true);
         setOrderDialogOpen(false);
       }
     } catch (err) {
-      setSnackbarMessage('خطا در ثبت سفارش');
+      setSnackbarMessage("خطا در ثبت سفارش");
       setSnackbarOpen(true);
     }
   };
 
-
+  if (isLoading) {
+    return (
+      <Container className="min-h-screen flex items-center justify-center">
+        <CircularProgress />
+      </Container>
+    );
+  }
+  if (!productsData?.isSuccess) {
+    debugger;
+    const errorMessage = productsData?.errors || "خطا در دریافت محصولات";
+    return (
+      <Container className="min-h-screen flex items-center justify-center">
+        <Alert
+          severity="error"
+          action={
+            <Button color="inherit" size="small" onClick={() => refetch()}>
+              تلاش مجدد
+            </Button>
+          }
+        >
+          {errorMessage}
+        </Alert>
+      </Container>
+    );
+  }
   return (
     <Container maxWidth="xl" className="py-8">
       {/* هدر و فیلترها */}
       <Box className="mb-8">
         <Typography
-          variant={isMobile ? 'h4' : 'h3'}
+          variant={isMobile ? "h4" : "h3"}
           className="font-bold text-gray-800 mb-6 text-center"
         >
           محصولات
         </Typography>
-
       </Box>
 
       {/* لیست محصولات */}
       <Grid container spacing={3}>
         {products.map((product) => (
           <Grid
-            size={{ xs: 12,sm:6, md: 4 ,lg:3}}
+            size={{ xs: 12, sm: 6, md: 4, lg: 3 }}
             key={product.id}
             className="flex"
           >
@@ -144,8 +158,6 @@ const ProductsPage = () => {
                 <CardMedia
                   component="img"
                   height="200"
-
-                  
                   image={product.imageUrl}
                   alt={product.name}
                   className="h-48 object-cover"
@@ -176,7 +188,6 @@ const ProductsPage = () => {
                 >
                   {product.description}
                 </Typography>
-
               </CardContent>
 
               {/* قیمت و دکمه‌ها */}
@@ -184,7 +195,10 @@ const ProductsPage = () => {
                 <Box className="w-full">
                   <Box className="flex justify-between items-center mb-3">
                     <Box>
-                      <Typography variant="h6" className="font-bold text-green-600">
+                      <Typography
+                        variant="h6"
+                        className="font-bold text-green-600"
+                      >
                         {/* {product.price.toLocaleString()} تومان */}
                       </Typography>
                       {/* {product.sellPrice && (
@@ -201,7 +215,7 @@ const ProductsPage = () => {
                       variant="contained"
                       color="primary"
                       startIcon={<AddShoppingCart />}
-                      onClick={() => handleOrderClick(product, 'buy')}
+                      onClick={() => handleOrderClick(product, "buy")}
                       // disabled={product.stock === 0}
                       className="flex-1 bg-blue-600 hover:bg-blue-700"
                     >
@@ -212,7 +226,7 @@ const ProductsPage = () => {
                       variant="outlined"
                       color="secondary"
                       startIcon={<Sell />}
-                      onClick={() => handleOrderClick(product, 'sell')}
+                      onClick={() => handleOrderClick(product, "sell")}
                       className="flex-1"
                     >
                       فروش
@@ -233,7 +247,7 @@ const ProductsPage = () => {
         fullWidth
       >
         <DialogTitle>
-          {orderType === 'buy' ? 'خرید محصول' : 'فروش محصول'}
+          {orderType === "buy" ? "خرید محصول" : "فروش محصول"}
         </DialogTitle>
         <DialogContent>
           {selectedProduct && (
@@ -246,35 +260,77 @@ const ProductsPage = () => {
                 />
                 <Box>
                   <Typography variant="h6">{selectedProduct.name}</Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  {/* <Typography variant="body2" color="text.secondary">
                     قیمت:
-                    {orderType === 'buy'
+                    {orderType === "buy"
                       ? selectedProduct.price?.toLocaleString()
                       : selectedProduct.sellPrice?.toLocaleString()}
                     تومان
-                  </Typography>
+                  </Typography> */}
                 </Box>
               </Box>
 
-              <TextField
-                fullWidth
-                type="number"
-                label="تعداد"
-                value={quantity}
-                onChange={(e) => setQuantity(Number(e.target.value))}
-                InputProps={{ inputProps: { min: 1, max: selectedProduct.stock } }}
+              <Grid
+                container
+                spacing={2}
+                sx={{ justifyContent: "space-between" }}
+              >
+                <Grid size={{ xs: 12 }} className="flex">
+                  <TextField
+                    type="number"
+                    label="تعداد"
+                    size="small"
+                    value={quantity}
+                    onChange={(e) => setQuantity(Number(e.target.value))}
+                    sx={{ mt: 2 }}
+                  />
+                </Grid>
+                <Grid size={{ xs: 8,  }} offset={2}  className="flex"  sx={{direction:'ltr'}}>
+                  <Slider
+                    getAriaLabel={() => "Minimum distance"}
+                    value={value1}
+                    onChange={handleChange}
+                    valueLabelDisplay="auto"
+                    getAriaValueText={valuetext}
+                    
+                  />
+                </Grid>
+                {/* <Grid size={{ xs: 12 }} className="flex">
+              <NumericFormat
+                value={minPrice}
+                customInput={TextField}
+                thousandSeparator
+                valueIsNumericString
+                onChange={(e) => setMinPrice(e.target.value)}
+                label={"حداقل قیمت"}
+                size="small"
+                sx={{ mt: 2}}
               />
+              </Grid>
+              <Grid size={{ xs: 12 }} className="flex">
+              <NumericFormat
+                value={maxPrice}
+                customInput={TextField}
+                thousandSeparator
+                valueIsNumericString
+                onChange={(e) => setMaxPrice(e.target.value)}
+                label={"حداکثر قیمت"}
+                size="small"
+                sx={{ mt: 2 }}
+              />
+                </Grid> */}
+              </Grid>
 
               <Box className="bg-gray-50 p-3 rounded">
-                <Typography variant="body2">
-                  موجودی: {selectedProduct.stock} عدد
-                </Typography>
+                {/* <Typography variant="body2">
+                  موجودی: {selectedProduct.quantity} عدد
+                </Typography> */}
                 <Typography variant="h6" className="mt-2">
                   مبلغ کل:
                   {(
-                    (orderType === 'buy'
-                      ? selectedProduct.price
-                      : selectedProduct.sellPrice || 0) * quantity
+                    (orderType === "buy"
+                      ? selectedProduct.minPrice
+                      : selectedProduct.maxPrice || 0) * quantity
                   ).toLocaleString()}
                   تومان
                 </Typography>
@@ -287,9 +343,9 @@ const ProductsPage = () => {
           <Button
             variant="contained"
             onClick={handleOrderSubmit}
-            color={orderType === 'buy' ? 'primary' : 'secondary'}
+            color={orderType === "buy" ? "primary" : "secondary"}
           >
-            تأیید {orderType === 'buy' ? 'خرید' : 'فروش'}
+            تأیید {orderType === "buy" ? "خرید" : "فروش"}
           </Button>
         </DialogActions>
       </Dialog>
