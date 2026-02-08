@@ -31,7 +31,7 @@ import { useProducts } from "./queries/useProducts";
 
 //const minDistance = 5;
 function valuetext(value: number) {
-  return `${value }°C`;
+  return `${value}°C`;
 }
 
 const ProductsPage = () => {
@@ -44,7 +44,13 @@ const ProductsPage = () => {
   const [value1, setValue1] = React.useState<number[]>([1400, 1800]);
   const [minPrice, setMinPrice] = useState<string>("1");
   const [maxPrice, setMaxPrice] = useState<string>("1");
+  // مقدار اولیه قیمت رو 10 میلیون قرار می‌دهیم
+  const [price, setPrice] = useState<number>(10000000);
 
+  // این تابع برای آپدیت کردن مقدار قیمت هنگام حرکت اسلایدره
+  const handleSliderChange = (event: Event, newValue: number | number[]) => {
+    setPrice(newValue as number);
+  };
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
@@ -59,7 +65,7 @@ const ProductsPage = () => {
   useEffect(() => {
     //fetchProducts();
   }, []);
-const handleChange = (event: Event, newValue: number[]) => {
+  const handleChange = (event: Event, newValue: number[]) => {
     setValue1(newValue);
   };
 
@@ -158,7 +164,7 @@ const handleChange = (event: Event, newValue: number[]) => {
                 <CardMedia
                   component="img"
                   height="200"
-                  image={product.imageUrl}
+                  image={'/productsImg/' + product.imageUrl}
                   alt={product.name}
                   className="h-48 object-cover"
                 />
@@ -254,7 +260,7 @@ const handleChange = (event: Event, newValue: number[]) => {
             <Box className="space-y-4 mt-2">
               <Box className="flex items-center space-x-3">
                 <img
-                  src={selectedProduct.imageUrl}
+                  src={'/productsImg/' + selectedProduct.imageUrl}
                   alt={selectedProduct.name}
                   className="w-20 h-20 object-cover rounded"
                 />
@@ -285,15 +291,33 @@ const handleChange = (event: Event, newValue: number[]) => {
                     sx={{ mt: 2 }}
                   />
                 </Grid>
-                <Grid size={{ xs: 8,  }} offset={2}  className="flex"  sx={{direction:'ltr'}}>
-                  <Slider
+                <Grid size={{ xs: 8, }} offset={2} className="flex" sx={{ direction: 'ltr' }}>
+                  <Box sx={{ width: 300 }}>
+                    <Typography gutterBottom>انتخاب قیمت</Typography>
+
+                    <Slider
+                      value={price}
+                      onChange={handleSliderChange}
+                      min={10000000}  // کمترین مقدار: 10 میلیون
+                      max={15000000}  // بیشترین مقدار: 15 میلیون
+                      step={100000}   // مقدار گام (مثلاً هر 100 هزار تومان تغییر کنه)
+                      valueLabelDisplay="auto"
+                      
+                      valueLabelFormat={(value) => `${value.toLocaleString()} تومان`}
+                    />
+
+                    <Typography variant="h6" sx={{ mt: 2 }}>
+                      قیمت انتخابی: {price.toLocaleString()} تومان
+                    </Typography>
+                  </Box>
+                  {/* <Slider 
                     getAriaLabel={() => "Minimum distance"}
                     value={value1}
                     onChange={handleChange}
                     valueLabelDisplay="auto"
                     getAriaValueText={valuetext}
                     
-                  />
+                  />*/}
                 </Grid>
                 {/* <Grid size={{ xs: 12 }} className="flex">
               <NumericFormat
