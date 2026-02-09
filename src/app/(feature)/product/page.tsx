@@ -26,7 +26,7 @@ import {
   Slider,
 } from "@mui/material";
 import { AddShoppingCart, Sell } from "@mui/icons-material";
-import { OrderType, Product } from "./types/product";
+import { Order, OrderType, Product } from "./types/product";
 import { useProducts } from "./queries/useProducts";
 
 //const minDistance = 5;
@@ -34,17 +34,15 @@ function valuetext(value: number) {
   return `${value}°C`;
 }
 
+
+
 const ProductsPage = () => {
-  const [selectedProduct, setSelectedProduct] = useState<
-    Product | null | undefined
-  >(null);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null | undefined>(null);
   const [orderDialogOpen, setOrderDialogOpen] = useState(false);
   const [orderType, setOrderType] = useState<OrderType>("buy");
+  const [order, setOrder] = useState<Order>();
+  
   const [quantity, setQuantity] = useState(1);
-  const [value1, setValue1] = React.useState<number[]>([1400, 1800]);
-  const [minPrice, setMinPrice] = useState<string>("1");
-  const [maxPrice, setMaxPrice] = useState<string>("1");
-  // مقدار اولیه قیمت رو 10 میلیون قرار می‌دهیم
   const [price, setPrice] = useState<number>(10000000);
 
   // این تابع برای آپدیت کردن مقدار قیمت هنگام حرکت اسلایدره
@@ -65,13 +63,12 @@ const ProductsPage = () => {
   useEffect(() => {
     //fetchProducts();
   }, []);
-  const handleChange = (event: Event, newValue: number[]) => {
-    setValue1(newValue);
-  };
-
 
   const handleOrderClick = (product: Product, type: OrderType) => {
     setSelectedProduct(product);
+    console.log(product.avragePrice)
+    const avg = (product.minPrice +product.maxPrice)/2
+    setPrice(avg)
     setOrderType(type);
     setQuantity(1);
     setOrderDialogOpen(true);
@@ -81,32 +78,32 @@ const ProductsPage = () => {
     if (!selectedProduct) return;
 
     try {
-      const orderData = {
+      const orderData: Order = {
         productId: selectedProduct.id,
         type: orderType,
         quantity,
-        totalPrice:
-          orderType === "buy"
-            ? selectedProduct.minPrice! * quantity
-            : selectedProduct.maxPrice! * quantity,
+        totalPrice:price* quantity,
+        status:'pending',
+        createdAt: new Date().toISOString()
       };
 
+      setOrder(orderData)
       // ارسال درخواست به بک‌اند
-      const response = await fetch("/api/orders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(orderData),
-      });
+      // const response = await fetch("/api/orders", {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify(orderData),
+      // });
 
-      if (response.ok) {
-        setSnackbarMessage(
-          orderType === "buy"
-            ? "خرید با موفقیت ثبت شد"
-            : "فروش با موفقیت ثبت شد",
-        );
-        setSnackbarOpen(true);
-        setOrderDialogOpen(false);
-      }
+      // if (response.ok) {
+      //   setSnackbarMessage(
+      //     orderType === "buy"
+      //       ? "خرید با موفقیت ثبت شد"
+      //       : "فروش با موفقیت ثبت شد",
+      //   );
+      //   setSnackbarOpen(true);
+      //   setOrderDialogOpen(false);
+      // }
     } catch (err) {
       setSnackbarMessage("خطا در ثبت سفارش");
       setSnackbarOpen(true);
@@ -253,26 +250,19 @@ const ProductsPage = () => {
         fullWidth
       >
         <DialogTitle>
-          {orderType === "buy" ? "خرید محصول" : "فروش محصول"}
+          {orderType === "buy" ? "درخواست خرید " : "درخواست فروش"}
         </DialogTitle>
         <DialogContent>
           {selectedProduct && (
             <Box className="space-y-4 mt-2">
               <Box className="flex items-center space-x-3">
                 <img
-                  src={'/productsImg/' + selectedProduct.imageUrl}
+                  src={'productsImg/' + selectedProduct.imageUrl}
                   alt={selectedProduct.name}
                   className="w-20 h-20 object-cover rounded"
                 />
                 <Box>
                   <Typography variant="h6">{selectedProduct.name}</Typography>
-                  {/* <Typography variant="body2" color="text.secondary">
-                    قیمت:
-                    {orderType === "buy"
-                      ? selectedProduct.price?.toLocaleString()
-                      : selectedProduct.sellPrice?.toLocaleString()}
-                    تومان
-                  </Typography> */}
                 </Box>
               </Box>
 
@@ -298,64 +288,31 @@ const ProductsPage = () => {
                     <Slider
                       value={price}
                       onChange={handleSliderChange}
-                      min={10000000}  // کمترین مقدار: 10 میلیون
-                      max={15000000}  // بیشترین مقدار: 15 میلیون
-                      step={100000}   // مقدار گام (مثلاً هر 100 هزار تومان تغییر کنه)
+                      min={selectedProduct.minPrice }  // کمترین مقدار: 10 میلیون
+                      max={selectedProduct.maxPrice}  // بیشترین مقدار: 15 میلیون
+                      step={selectedProduct.step}   // مقدار گام (مثلاً هر 100 هزار تومان تغییر کنه)
                       valueLabelDisplay="auto"
                       
                       valueLabelFormat={(value) => `${value.toLocaleString()} تومان`}
                     />
 
                     <Typography variant="h6" sx={{ mt: 2 }}>
-                      قیمت انتخابی: {price.toLocaleString()} تومان
+                      قیمت انتخابی: {price?.toLocaleString()} تومان
                     </Typography>
                   </Box>
-                  {/* <Slider 
-                    getAriaLabel={() => "Minimum distance"}
-                    value={value1}
-                    onChange={handleChange}
-                    valueLabelDisplay="auto"
-                    getAriaValueText={valuetext}
-                    
-                  />*/}
                 </Grid>
-                {/* <Grid size={{ xs: 12 }} className="flex">
-              <NumericFormat
-                value={minPrice}
-                customInput={TextField}
-                thousandSeparator
-                valueIsNumericString
-                onChange={(e) => setMinPrice(e.target.value)}
-                label={"حداقل قیمت"}
-                size="small"
-                sx={{ mt: 2}}
-              />
-              </Grid>
-              <Grid size={{ xs: 12 }} className="flex">
-              <NumericFormat
-                value={maxPrice}
-                customInput={TextField}
-                thousandSeparator
-                valueIsNumericString
-                onChange={(e) => setMaxPrice(e.target.value)}
-                label={"حداکثر قیمت"}
-                size="small"
-                sx={{ mt: 2 }}
-              />
-                </Grid> */}
               </Grid>
 
               <Box className="bg-gray-50 p-3 rounded">
-                {/* <Typography variant="body2">
-                  موجودی: {selectedProduct.quantity} عدد
-                </Typography> */}
                 <Typography variant="h6" className="mt-2">
                   مبلغ کل:
-                  {(
-                    (orderType === "buy"
-                      ? selectedProduct.minPrice
-                      : selectedProduct.maxPrice || 0) * quantity
-                  ).toLocaleString()}
+                  {price * quantity
+                  //   (orderType === "buy"
+                  //     ? selectedProduct.minPrice
+                  //     : selectedProduct.maxPrice || 0) * quantity
+                  // ).toLocaleString()
+                  } 
+                  &nbsp;
                   تومان
                 </Typography>
               </Box>
